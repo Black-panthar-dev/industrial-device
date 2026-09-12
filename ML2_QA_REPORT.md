@@ -4,10 +4,10 @@
 
 **Result: Passed with one known pre-existing sidebar presentation issue.**
 
-This report covers ML2 work completed through Chunk 3: navigation and screen
-shells, the reusable ML2 component library, and the detailed General screen.
-Measurements and Communications detailed forms are not included because their
-requirements have not yet been implemented.
+This report covers ML2 work completed through Chunk 4: navigation and screen
+shells, the reusable ML2 component library, and the detailed General and
+Measurements screens. Communications remains a placeholder because its
+detailed requirements have not yet been implemented.
 
 ## Test environment
 
@@ -30,7 +30,22 @@ tests must run in a desktop-enabled process.
 - [x] ML2 page registration tests pass.
 - [x] Reusable component availability test passes.
 - [x] General responsive breakpoint tests pass.
-- [x] Full automated suite: **18 tests passed**.
+- [x] Full automated suite: **20 tests passed**.
+
+## Measurements screen checks
+
+- [x] All five required configuration sections render.
+- [x] All three required right-side panels render.
+- [x] Voltage and current dummy metrics render with highlighted values.
+- [x] Internal, external, and automatic measurement modes are available.
+- [x] Internal and external shunt settings render.
+- [x] Right panel moves below the main content at constrained widths.
+- [x] Header controls reflow at constrained widths.
+- [x] Light and Dark themes apply without runtime errors.
+- [x] Export, Import, and Reset Energy Counters remain placeholder actions.
+- [x] The explicit focus chain contains 22 targets.
+- [x] Tab, Shift+Tab, wrapping traversal, and radio Space activation pass.
+- [x] Navigation to other ML2 screens and Settings remains functional.
 
 ## PDF mockup rendering
 
@@ -142,8 +157,8 @@ complete **Configuration** label is now visible.
 
 ## Remaining QA
 
-After detailed Measurements and Communications screens are implemented, repeat
-the same checks for:
+After the detailed Communications screen is implemented, repeat the same checks
+for:
 
 - Required fields and dummy values.
 - Wide, medium, and narrow reflow.

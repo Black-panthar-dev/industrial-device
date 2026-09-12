@@ -394,15 +394,19 @@ class RadioGroup(ctk.CTkFrame):
                 value=option_value,
                 variable=self.variable,
                 command=command,
+                width=max(95, 28 + len(label) * 5),
+                radiobutton_width=18,
+                radiobutton_height=18,
                 border_color=COLOR_BORDER,
                 fg_color=COLOR_PRIMARY,
                 hover_color=COLOR_PRIMARY_HOVER,
                 text_color=COLOR_TEXT,
+                font=ctk.CTkFont(size=11),
             )
             button.grid(
                 row=row,
                 column=column,
-                padx=(0, 14) if orientation == "horizontal" else 0,
+                padx=(0, 6) if orientation == "horizontal" else 0,
                 pady=5,
                 sticky="w",
             )

@@ -2,10 +2,10 @@
 
 ## Document status
 
-This document records the Milestone 2 work completed through **Chunk 3**. It is
+This document records the Milestone 2 work completed through **Chunk 4**. It is
 an interim delivery record, not a declaration that all ML2 screens are final.
-The General screen is implemented in detail. Measurements and Communications
-currently contain their approved page shells and await later detailed chunks.
+The General and Measurements screens are implemented in detail. Communications
+currently contains its approved page shell and awaits a later detailed chunk.
 
 ## ML2 scope
 
@@ -96,6 +96,19 @@ The following actions only print a descriptive placeholder message:
 
 No action communicates with a device or performs Modbus, serial, or USB work.
 
+## Chunk 4 — Measurements screen
+
+The production Measurements screen now provides Voltage Measurement, Current
+Measurement, Measurement Processing, Calculated Measurements, and Measurement
+Status sections. It includes both internal and external shunt settings, live
+dummy voltage/current values, calculated-value controls, and the required Live
+Measurements, Measurement Status, and Information side panels.
+
+The screen uses 22 explicit keyboard focus targets covering header controls,
+checkboxes, radio choices, dropdowns, entries, and buttons. Its right panel,
+form fields, and header controls reflow at the same responsive modes used by
+General. All displayed measurement values remain placeholders.
+
 ## Files created during ML2
 
 - `views/general_view.py`
@@ -105,6 +118,7 @@ No action communicates with a device or performs Modbus, serial, or USB work.
 - `test_ml2_navigation.py`
 - `test_ml2_components.py`
 - `test_general_view.py`
+- `test_measurements_view.py`
 - `ML2_WORK_COMPLETED.md`
 - `ML2_QA_REPORT.md`
 
@@ -119,9 +133,9 @@ No action communicates with a device or performs Modbus, serial, or USB work.
 
 ## Current milestone boundary
 
-General is the only detailed ML2 screen implemented at this stage.
-Measurements and Communications remain intentional placeholders until their
-detailed requirements are supplied and implemented.
+General and Measurements are the detailed ML2 screens implemented at this
+stage. Communications remains an intentional placeholder until its detailed
+requirements are supplied and implemented.
 
 ## Run the application
 
@@ -138,4 +152,3 @@ Alternatively, use the project interpreter directly:
 ```
 
 Select **Configuration > General** to inspect the completed Chunk 3 screen.
-

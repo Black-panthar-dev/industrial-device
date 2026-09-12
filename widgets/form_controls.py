@@ -203,7 +203,13 @@ def keyboard_focus_target(control: Any) -> Any:
 
 def configure_focus_chain(controls: Sequence[Any]) -> list[Any]:
     """Bind an explicit, wrapping Tab/Shift+Tab order for a control sequence."""
-    targets = [keyboard_focus_target(control) for control in controls]
+    targets: list[Any] = []
+    for control in controls:
+        multiple_accessor = getattr(control, "keyboard_focus_targets", None)
+        if multiple_accessor is not None:
+            targets.extend(multiple_accessor())
+        else:
+            targets.append(keyboard_focus_target(control))
     if not targets:
         return targets
 
