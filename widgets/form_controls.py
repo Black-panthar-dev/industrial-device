@@ -66,6 +66,8 @@ class _ModernComboPopup(ctk.CTkToplevel):
         container.grid_columnconfigure(0, weight=1)
 
         selected_value = owner.get()
+        self.buttons: list[ctk.CTkButton] = []
+        self.active_index = 0
         for row, value in enumerate(values):
             selected = value == selected_value
             button = ctk.CTkButton(
@@ -90,6 +92,14 @@ class _ModernComboPopup(ctk.CTkToplevel):
                 ),
                 sticky="ew",
             )
+            enable_button_keyboard(button)
+            target = button._canvas
+            target.bind("<Up>", lambda _event, i=row: self._move_focus(i - 1), add="+")
+            target.bind("<Down>", lambda _event, i=row: self._move_focus(i + 1), add="+")
+            target.bind("<Escape>", lambda _event: self.close(), add="+")
+            self.buttons.append(button)
+            if selected:
+                self.active_index = row
 
         self.bind("<Escape>", lambda _event: self.close())
         self.bind("<FocusOut>", self._schedule_focus_check)
@@ -98,7 +108,16 @@ class _ModernComboPopup(ctk.CTkToplevel):
     def _finish_opening(self) -> None:
         if self.winfo_exists():
             self.lift()
-            self.focus_force()
+            self._focus_active()
+
+    def _move_focus(self, index: int) -> str:
+        self.active_index = index % len(self.buttons)
+        self._focus_active()
+        return "break"
+
+    def _focus_active(self) -> None:
+        if self.buttons:
+            self.buttons[self.active_index]._canvas.focus_force()
 
     def _schedule_focus_check(self, _event: Any = None) -> None:
         self.after(80, self._close_if_focus_left)
@@ -144,6 +163,20 @@ class ThemedComboBox(ctk.CTkComboBox):
         super().__init__(master, **kwargs)
         self._modern_popup: _ModernComboPopup | None = None
         self._entry.configure(takefocus=True)
+        self._entry.bind("<Return>", self._open_from_keyboard, add="+")
+        self._entry.bind("<KP_Enter>", self._open_from_keyboard, add="+")
+        self._entry.bind("<space>", self._open_from_keyboard, add="+")
+        self._entry.bind("<Down>", self._open_from_keyboard, add="+")
+        self._entry.bind("<Escape>", self._close_from_keyboard, add="+")
+
+    def _open_from_keyboard(self, _event: Any = None) -> str:
+        self._open_dropdown_menu()
+        return "break"
+
+    def _close_from_keyboard(self, _event: Any = None) -> str:
+        if self._modern_popup is not None:
+            self._modern_popup.close()
+        return "break"
 
     def _open_dropdown_menu(self) -> None:
         """Open the application popup instead of CustomTkinter's Tk menu."""

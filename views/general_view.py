@@ -7,7 +7,7 @@ import customtkinter as ctk
 from services.translation_service import t
 from utils.theme import COLOR_ON_PRIMARY, COLOR_PRIMARY, COLOR_SCROLLBAR, COLOR_SCROLLBAR_HOVER
 from widgets.cards import SectionCard
-from widgets.form_controls import CheckboxRow, LabeledDropdown, LabeledEntry, OutlineButton, PrimaryButton, ThemedComboBox
+from widgets.form_controls import CheckboxRow, LabeledDropdown, LabeledEntry, OutlineButton, PrimaryButton, ThemedComboBox, configure_focus_chain
 from widgets.icons import create_icon
 from widgets.ml2_components import ActionButtonRow, InlineInfoBanner, PageHeader, ReadonlyField, SectionHeader, StatusPanel, StatusRow
 
@@ -27,8 +27,10 @@ class GeneralView(ctk.CTkFrame):
         self._resize_job: str | None = None
         self._layout_mode: tuple[bool, bool, bool] | None = None
         self._form_groups: list[tuple[ctk.CTkFrame, list[ctk.CTkBaseClass]]] = []
+        self.focus_controls: list[Any] = []
         self._build_header()
         self._build_workspace()
+        self.focus_targets = configure_focus_chain(self.focus_controls)
         self.bind("<Configure>", self._schedule_responsive_layout, add="+")
         self.after_idle(self._apply_responsive_layout)
 
@@ -62,6 +64,7 @@ class GeneralView(ctk.CTkFrame):
             command=lambda: self._placeholder_action(t("general.import")),
         )
         self.header.add_control(self.import_button)
+        self.focus_controls.extend((self.theme_menu, self.export_button, self.import_button))
 
     def _build_workspace(self) -> None:
         self.workspace = ctk.CTkScrollableFrame(
@@ -111,52 +114,61 @@ class GeneralView(ctk.CTkFrame):
             control.grid(row=row, column=column, padx=padding, pady=(0, 13), sticky="ew")
 
     def _build_identification_section(self, row: int) -> None:
-        fields = self._new_section(row, 1, "general.identification.title", "general.identification.subtitle")
+        fields = self._new_section(row, 1, "general.sections.device_identification.title", "general.sections.device_identification.subtitle")
+        device_name = LabeledEntry(fields, t("general.device_name"), value=t("general.value.device_name"))
+        site_name = LabeledEntry(fields, t("general.site_name"), value=t("general.value.site_name"))
         self._register_fields(fields, [
-            LabeledEntry(fields, t("general.device_name"), value=t("general.value.device_name")),
-            LabeledEntry(fields, t("general.site_name"), value=t("general.value.site_name")),
+            device_name,
+            site_name,
             ReadonlyField(fields, t("general.serial_number"), t("general.value.serial_number")),
             ReadonlyField(fields, t("general.hardware_version"), t("general.value.hardware_version")),
             ReadonlyField(fields, t("general.firmware_version"), t("general.value.firmware_version")),
         ])
+        self.focus_controls.extend((device_name, site_name))
 
     def _build_datetime_section(self, row: int) -> None:
-        fields = self._new_section(row, 2, "general.datetime.title", "general.datetime.subtitle")
+        fields = self._new_section(row, 2, "general.sections.date_time.title", "general.sections.date_time.subtitle")
         self.ntp_status = ReadonlyField(fields, t("general.ntp_status"), t("general.value.synchronized"))
+        timezone = LabeledDropdown(fields, t("general.timezone"), [t("general.value.timezone"), t("general.options.timezone.utc"), t("general.options.timezone.karachi")], value=t("general.value.timezone"))
+        sync = ActionButtonRow(fields, [(t("general.sync_pc"), lambda: self._placeholder_action(t("general.sync_pc")))])
+        use_ntp = CheckboxRow(fields, t("general.use_ntp"), checked=True)
         self._register_fields(fields, [
             ReadonlyField(fields, t("general.device_datetime"), t("general.value.device_datetime")),
-            LabeledDropdown(fields, t("general.timezone"), [t("general.value.timezone"), "UTC", "Asia / Karachi (UTC+05:00)"], value=t("general.value.timezone")),
-            ActionButtonRow(fields, [(t("general.sync_pc"), lambda: self._placeholder_action(t("general.sync_pc")))]),
-            CheckboxRow(fields, t("general.use_ntp"), checked=True),
+            timezone,
+            sync,
+            use_ntp,
             self.ntp_status,
         ])
+        self.focus_controls.extend((timezone, *sync.buttons, use_ntp))
 
     def _build_operation_section(self, row: int) -> None:
-        fields = self._new_section(row, 3, "general.operation.title", "general.operation.subtitle")
-        self._register_fields(fields, [
-            LabeledDropdown(fields, t("general.measurement_interval"), ["1 second", "5 seconds", "10 seconds"], value="1 second"),
-            LabeledDropdown(fields, t("general.logging_interval"), ["30 seconds", "60 seconds", "5 minutes"], value="60 seconds"),
-            CheckboxRow(fields, t("general.enable_watchdog"), checked=True),
-            CheckboxRow(fields, t("general.scheduled_reboot"), checked=False),
-            LabeledDropdown(fields, t("general.reboot_frequency"), ["Daily", "Weekly", "Monthly"], value="Daily"),
-            LabeledEntry(fields, t("general.reboot_time"), value="03:00"),
-        ])
+        fields = self._new_section(row, 3, "general.sections.general_operation.title", "general.sections.general_operation.subtitle")
+        measurement_interval = LabeledDropdown(fields, t("general.measurement_interval"), [t("general.options.interval.1_second"), t("general.options.interval.5_seconds"), t("general.options.interval.10_seconds")], value=t("general.options.interval.1_second"))
+        logging_interval = LabeledDropdown(fields, t("general.logging_interval"), [t("general.options.interval.30_seconds"), t("general.options.interval.60_seconds"), t("general.options.interval.5_minutes")], value=t("general.options.interval.60_seconds"))
+        watchdog = CheckboxRow(fields, t("general.enable_watchdog"), checked=True)
+        scheduled_reboot = CheckboxRow(fields, t("general.scheduled_reboot"), checked=False)
+        reboot_frequency = LabeledDropdown(fields, t("general.reboot_frequency"), [t("general.options.frequency.daily"), t("general.options.frequency.weekly"), t("general.options.frequency.monthly")], value=t("general.options.frequency.daily"))
+        reboot_time = LabeledEntry(fields, t("general.reboot_time"), value=t("general.value.reboot_time"))
+        controls = [measurement_interval, logging_interval, watchdog, scheduled_reboot, reboot_frequency, reboot_time]
+        self._register_fields(fields, controls)
+        self.focus_controls.extend(controls)
 
     def _build_information_section(self, row: int) -> None:
-        fields = self._new_section(row, 4, "general.information.title", "general.information.subtitle")
+        fields = self._new_section(row, 4, "general.sections.device_information.title", "general.sections.device_information.subtitle")
         self._register_fields(fields, [
             ReadonlyField(fields, t("general.status"), t("general.value.connected")),
             ReadonlyField(fields, t("general.uptime"), t("general.value.uptime")),
             ReadonlyField(fields, t("general.last_reset"), t("general.value.last_reset")),
-            ReadonlyField(fields, t("general.battery_voltage"), "--"),
-            ReadonlyField(fields, t("general.signal_quality"), "--"),
+            ReadonlyField(fields, t("general.battery_voltage"), t("general.value.unavailable")),
+            ReadonlyField(fields, t("general.signal_quality"), t("general.value.unavailable")),
         ])
 
     def _build_actions_section(self, row: int) -> None:
-        fields = self._new_section(row, 5, "general.actions.title", "general.actions.subtitle")
+        fields = self._new_section(row, 5, "general.sections.configuration_actions.title", "general.sections.configuration_actions.subtitle")
         keys = ("general.read_device", "general.write_device", "general.load_file", "general.save_file")
         self.action_buttons = ActionButtonRow(fields, [(t(key), lambda action=t(key): self._placeholder_action(action)) for key in keys])
         self.action_buttons.grid(row=0, column=0, columnspan=2, sticky="ew")
+        self.focus_controls.extend(self.action_buttons.buttons)
 
     def _status_panel(self, row: int, title_key: str, values: list[tuple[str, str]]) -> None:
         panel = StatusPanel(self.right_panel, t(title_key))
@@ -167,15 +179,15 @@ class GeneralView(ctk.CTkFrame):
 
     def _build_right_panel(self) -> None:
         self._status_panel(0, "general.connection.title", [
-            ("general.status", t("general.value.connected")), ("general.port", "COM3"),
-            ("general.baudrate", "115200 bps"), ("general.connection_time", "00:12:24"),
+            ("general.status", t("general.value.connected")), ("general.port", t("general.value.port")),
+            ("general.baudrate", t("general.value.baudrate")), ("general.connection_time", t("general.value.connection_time")),
         ])
         self._status_panel(1, "general.summary.title", [
             ("general.device_name", t("general.value.device_name")), ("general.serial_number", t("general.value.serial_number")),
             ("general.firmware_version", t("general.value.firmware_version")), ("general.hardware_version", t("general.value.hardware_version")),
         ])
         self._status_panel(2, "general.configuration_status.title", [
-            ("general.last_read", "24/08/2026 21:12:10"), ("general.last_written", "24/08/2026 21:15:32"),
+            ("general.last_read", t("general.value.last_read")), ("general.last_written", t("general.value.last_written")),
             ("general.configuration_source", t("general.value.device")),
         ])
         InlineInfoBanner(self.right_panel, t("general.connection_banner")).grid(row=3, column=0, sticky="ew")

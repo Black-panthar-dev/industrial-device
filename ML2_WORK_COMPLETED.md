@@ -2,10 +2,9 @@
 
 ## Document status
 
-This document records the Milestone 2 work completed through **Chunk 4**. It is
-an interim delivery record, not a declaration that all ML2 screens are final.
-The General and Measurements screens are implemented in detail. Communications
-currently contains its approved page shell and awaits a later detailed chunk.
+This document records the Milestone 2 work completed through **Chunk 7**. The
+General, Measurements, and Communications screens are implemented in detail
+within the approved GUI-only scope.
 
 ## ML2 scope
 
@@ -109,6 +108,44 @@ checkboxes, radio choices, dropdowns, entries, and buttons. Its right panel,
 form fields, and header controls reflow at the same responsive modes used by
 General. All displayed measurement values remain placeholders.
 
+## Chunk 5 — Communications screen
+
+The production Communications screen now provides RS485 / Modbus RTU, RS232,
+USB Interface, and Expansion / Communication Module sections. It contains the
+required dummy serial parameters and packet counters, USB information, 4G
+module values, masked Password/PIN entries, and 4G/Module Information segmented
+navigation.
+
+Communication Status, Network Status, and Configuration Status panels appear
+beside the form at wide widths and move below it at constrained widths. The
+screen contains 24 explicit keyboard focus targets and 12 theme-aware dropdowns.
+All actions are placeholders; no protocol or device communication is present.
+
+## Chunk 6 — Translation architecture
+
+All visible ML2 labels, section headings, helper text, dropdown options, dummy
+display values, and placeholder messages are centralized in `locales/en.json`.
+Section keys use organized namespaces such as `general.sections.*`,
+`measurements.sections.*`, and `communications.sections.*`. The three production
+views use the existing `t()` translation helper, and sidebar labels remain
+centralized under `sidebar.*`.
+
+An automated AST-based check verifies that every literal ML2 translation key
+used by the views exists in the English locale. Live GUI inspection also
+confirms that no dotted fallback keys appear on any ML2 screen.
+
+## Chunk 7 — Keyboard navigation
+
+All three ML2 screens use the shared explicit focus-chain utility. General has
+18 focus targets, Measurements has 22, and Communications has 24. Tab and
+Shift+Tab traverse in visual order and wrap at the ends of each screen.
+
+Shared ComboBoxes open with Enter, keypad Enter, Space, or Down. Their popup
+choices support Up/Down navigation, Enter selection, and Escape closing.
+Buttons support Enter and Space, checkboxes and radio choices support Space,
+and Communications segmented tabs are included in the normal focus order.
+Mouse command behavior remains unchanged.
+
 ## Files created during ML2
 
 - `views/general_view.py`
@@ -119,6 +156,7 @@ General. All displayed measurement values remain placeholders.
 - `test_ml2_components.py`
 - `test_general_view.py`
 - `test_measurements_view.py`
+- `test_communications_view.py`
 - `ML2_WORK_COMPLETED.md`
 - `ML2_QA_REPORT.md`
 
@@ -133,9 +171,9 @@ General. All displayed measurement values remain placeholders.
 
 ## Current milestone boundary
 
-General and Measurements are the detailed ML2 screens implemented at this
-stage. Communications remains an intentional placeholder until its detailed
-requirements are supplied and implemented.
+All three ML2 screens are implemented within the GUI-only milestone boundary.
+Hardware communication, Modbus behavior, serial/USB access, 4G networking,
+database storage, and installer work remain explicitly excluded.
 
 ## Run the application
 
@@ -151,4 +189,5 @@ Alternatively, use the project interpreter directly:
 .\.venv\Scripts\python.exe main.py
 ```
 
-Select **Configuration > General** to inspect the completed Chunk 3 screen.
+Use the Configuration group to inspect the General, Measurements, and
+Communications screens.

@@ -417,6 +417,12 @@ class RadioGroup(ctk.CTkFrame):
             button._text_label.bind(
                 "<Return>", lambda _event, item=button: self._select_from_keyboard(item), add="+"
             )
+            button._text_label.bind(
+                "<FocusIn>", lambda _event, item=button: self._show_radio_focus(item), add="+"
+            )
+            button._text_label.bind(
+                "<FocusOut>", lambda _event, item=button: self._hide_radio_focus(item), add="+"
+            )
             self.buttons.append(button)
 
     @staticmethod
@@ -432,3 +438,14 @@ class RadioGroup(ctk.CTkFrame):
 
     def keyboard_focus_targets(self) -> list[Any]:
         return [button._text_label for button in self.buttons]
+
+    @staticmethod
+    def _show_radio_focus(button: ctk.CTkRadioButton) -> None:
+        button._text_label.configure(
+            highlightthickness=2,
+            highlightcolor=button._apply_appearance_mode(COLOR_PRIMARY),
+        )
+
+    @staticmethod
+    def _hide_radio_focus(button: ctk.CTkRadioButton) -> None:
+        button._text_label.configure(highlightthickness=0)

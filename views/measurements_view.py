@@ -112,26 +112,26 @@ class MeasurementsView(ctk.CTkFrame):
             padding = (0, 8) if column == 0 and columns > 1 else ((8, 0) if column else 0)
             control.grid(row=row, column=column, padx=padding, pady=(0, 13), sticky="ew")
 
-    def _calibration_card(self, parent: ctk.CTkFrame, offset_label: str, offset_value: str = "0.000") -> tuple[SectionCard, list[Any]]:
+    def _calibration_card(self, parent: ctk.CTkFrame, offset_label: str, offset_value: str | None = None) -> tuple[SectionCard, list[Any]]:
         card = SectionCard(parent, title=t("measurements.calibration"), compact=True)
         card.body.grid_columnconfigure((0, 1), weight=1, uniform="calibration")
-        offset = LabeledEntry(card.body, offset_label, value=offset_value)
-        gain = LabeledEntry(card.body, t("measurements.gain"), value="1.00000")
+        offset = LabeledEntry(card.body, offset_label, value=offset_value or t("measurements.values.offset"))
+        gain = LabeledEntry(card.body, t("measurements.gain"), value=t("measurements.values.gain"))
         offset.grid(row=0, column=0, padx=(0, 6), sticky="ew")
         gain.grid(row=0, column=1, padx=(6, 0), sticky="ew")
         return card, [offset, gain]
 
     def _build_voltage_section(self, row: int) -> None:
-        fields = self._new_section(row, 1, "measurements.voltage.title", "measurements.voltage.subtitle")
+        fields = self._new_section(row, 1, "measurements.sections.voltage.title", "measurements.sections.voltage.subtitle")
         enabled = CheckboxRow(fields, t("measurements.enable_voltage"), checked=True)
-        input_range = ReadonlyField(fields, t("measurements.input_range"), "9 - 30 V DC")
+        input_range = ReadonlyField(fields, t("measurements.input_range"), t("measurements.values.voltage_range"))
         calibration, calibration_controls = self._calibration_card(fields, t("measurements.offset_v"))
-        self.live_voltage = MetricValue(fields, "13.42", "V", label=t("measurements.live_voltage"))
+        self.live_voltage = MetricValue(fields, t("measurements.values.live_voltage"), t("measurements.units.volts"), label=t("measurements.live_voltage"))
         self._register_fields(fields, [enabled, input_range, calibration, self.live_voltage])
         self.focus_controls.extend((enabled, *calibration_controls))
 
     def _build_current_section(self, row: int) -> None:
-        fields = self._new_section(row, 2, "measurements.current.title", "measurements.current.subtitle")
+        fields = self._new_section(row, 2, "measurements.sections.current.title", "measurements.sections.current.subtitle")
         enabled = CheckboxRow(fields, t("measurements.enable_current"), checked=True)
         modes = RadioGroup(
             fields,
@@ -141,35 +141,35 @@ class MeasurementsView(ctk.CTkFrame):
         )
         internal = SectionCard(fields, title=t("measurements.internal_shunt"), compact=True)
         internal.body.grid_columnconfigure(0, weight=1)
-        internal_range = ReadonlyField(internal.body, t("measurements.range_max"), "200 mA")
+        internal_range = ReadonlyField(internal.body, t("measurements.range_max"), t("measurements.values.internal_range"))
         internal_range.grid(row=0, column=0, pady=(0, 10), sticky="ew")
         internal_calibration, internal_controls = self._calibration_card(internal.body, t("measurements.offset_ma"))
         internal_calibration.grid(row=1, column=0, sticky="ew")
         external = SectionCard(fields, title=t("measurements.external_shunt"), compact=True)
         external.body.grid_columnconfigure((0, 1), weight=1, uniform="external")
-        rated = LabeledDropdown(external.body, t("measurements.rated_current"), ["10 A", "20 A", "50 A"], value="10 A")
-        voltage = LabeledDropdown(external.body, t("measurements.shunt_voltage"), ["50 mV", "100 mV"], value="100 mV")
-        resistance = ReadonlyField(external.body, t("measurements.shunt_resistance"), "10.00 mΩ")
+        rated = LabeledDropdown(external.body, t("measurements.rated_current"), [t("measurements.options.current.10a"), t("measurements.options.current.20a"), t("measurements.options.current.50a")], value=t("measurements.options.current.10a"))
+        voltage = LabeledDropdown(external.body, t("measurements.shunt_voltage"), [t("measurements.options.shunt_voltage.50mv"), t("measurements.options.shunt_voltage.100mv")], value=t("measurements.options.shunt_voltage.100mv"))
+        resistance = ReadonlyField(external.body, t("measurements.shunt_resistance"), t("measurements.values.shunt_resistance"))
         rated.grid(row=0, column=0, padx=(0, 6), pady=(0, 10), sticky="ew")
         voltage.grid(row=0, column=1, padx=(6, 0), pady=(0, 10), sticky="ew")
         resistance.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         external_calibration, external_controls = self._calibration_card(external.body, t("measurements.offset_ma"))
         external_calibration.grid(row=2, column=0, columnspan=2, sticky="ew")
-        self.live_current = MetricValue(fields, "127.4", "mA", label=t("measurements.live_current"))
+        self.live_current = MetricValue(fields, t("measurements.values.live_current"), t("measurements.units.milliamps"), label=t("measurements.live_current"))
         self._register_fields(fields, [enabled, modes, internal, external, self.live_current])
         self.focus_controls.extend((enabled, modes, *internal_controls, rated, voltage, *external_controls))
 
     def _build_processing_section(self, row: int) -> None:
-        fields = self._new_section(row, 3, "measurements.processing.title", "measurements.processing.subtitle")
-        interval = LabeledDropdown(fields, t("measurements.interval"), ["1 second", "5 seconds", "10 seconds"], value="1 second")
-        averaging = LabeledDropdown(fields, t("measurements.averaging"), ["1 sample", "4 samples", "8 samples", "16 samples"], value="8 samples")
-        filter_type = LabeledDropdown(fields, t("measurements.filter_type"), ["Moving average", "Median", "None"], value="Moving average")
-        threshold = LabeledEntry(fields, t("measurements.zero_threshold"), value="1.00 mA", helper_text=t("measurements.zero_threshold.help"))
+        fields = self._new_section(row, 3, "measurements.sections.processing.title", "measurements.sections.processing.subtitle")
+        interval = LabeledDropdown(fields, t("measurements.interval"), [t("measurements.options.interval.1_second"), t("measurements.options.interval.5_seconds"), t("measurements.options.interval.10_seconds")], value=t("measurements.options.interval.1_second"))
+        averaging = LabeledDropdown(fields, t("measurements.averaging"), [t("measurements.options.averaging.1"), t("measurements.options.averaging.4"), t("measurements.options.averaging.8"), t("measurements.options.averaging.16")], value=t("measurements.options.averaging.8"))
+        filter_type = LabeledDropdown(fields, t("measurements.filter_type"), [t("measurements.options.filter.moving_average"), t("measurements.options.filter.median"), t("measurements.options.filter.none")], value=t("measurements.options.filter.moving_average"))
+        threshold = LabeledEntry(fields, t("measurements.zero_threshold"), value=t("measurements.values.zero_threshold"), helper_text=t("measurements.zero_threshold.help"))
         self._register_fields(fields, [interval, averaging, filter_type, threshold])
         self.focus_controls.extend((interval, averaging, filter_type, threshold))
 
     def _build_calculated_section(self, row: int) -> None:
-        fields = self._new_section(row, 4, "measurements.calculated.title", "measurements.calculated.subtitle")
+        fields = self._new_section(row, 4, "measurements.sections.calculated.title", "measurements.sections.calculated.subtitle")
         banner = InlineInfoBanner(fields, t("measurements.calculated.banner"))
         enabled = CheckboxRow(fields, t("measurements.enable_calculated"), checked=True)
         reset = ActionButtonRow(fields, [(t("measurements.reset_counters"), lambda: self._placeholder_action(t("measurements.reset_counters")))])
@@ -177,10 +177,10 @@ class MeasurementsView(ctk.CTkFrame):
         self.focus_controls.extend((enabled, *reset.buttons))
 
     def _build_status_section(self, row: int) -> None:
-        fields = self._new_section(row, 5, "measurements.status_section.title", "measurements.status_section.subtitle")
+        fields = self._new_section(row, 5, "measurements.sections.status.title", "measurements.sections.status.subtitle")
         values = [
-            ("measurements.measurement_status", "OK"), ("measurements.last_update", "24/08/2026 21:42:16"),
-            ("measurements.engine", "Running"), ("measurements.overrange", "No"), ("measurements.sensor_error", "No"),
+            ("measurements.measurement_status", t("measurements.values.ok")), ("measurements.last_update", t("measurements.values.last_update_full")),
+            ("measurements.engine", t("measurements.values.running")), ("measurements.overrange", t("measurements.values.no")), ("measurements.sensor_error", t("measurements.values.no")),
         ]
         self._register_fields(fields, [ReadonlyField(fields, t(key), value) for key, value in values])
 
@@ -192,16 +192,16 @@ class MeasurementsView(ctk.CTkFrame):
 
     def _build_right_panel(self) -> None:
         self._status_panel(0, "measurements.live_panel.title", [
-            ("measurements.voltage", "13.42 V"), ("measurements.current", "127.4 mA"),
-            ("measurements.power", "1.71 W"), ("measurements.energy", "42.8 Wh"), ("measurements.charge", "3.12 Ah"),
+            ("measurements.voltage", t("measurements.values.voltage_display")), ("measurements.current", t("measurements.values.current_display")),
+            ("measurements.power", t("measurements.values.power_display")), ("measurements.energy", t("measurements.values.energy_display")), ("measurements.charge", t("measurements.values.charge_display")),
         ])
         self._status_panel(1, "measurements.status_panel.title", [
-            ("measurements.status", "OK"), ("measurements.last_update", "21:42:16"),
-            ("measurements.overrange", "No"), ("measurements.sensor_error", "No"),
+            ("measurements.status", t("measurements.values.ok")), ("measurements.last_update", t("measurements.values.last_update_time")),
+            ("measurements.overrange", t("measurements.values.no")), ("measurements.sensor_error", t("measurements.values.no")),
         ])
         self._status_panel(2, "measurements.information.title", [
-            ("measurements.source", "Device"), ("measurements.interval", "1 s"),
-            ("measurements.averaging", "8 samples"), ("measurements.filter", "Moving average"),
+            ("measurements.source", t("measurements.values.device")), ("measurements.interval", t("measurements.values.interval_short")),
+            ("measurements.averaging", t("measurements.options.averaging.8")), ("measurements.filter", t("measurements.options.filter.moving_average")),
         ])
 
     def _schedule_responsive_layout(self, _event: Any = None) -> None:

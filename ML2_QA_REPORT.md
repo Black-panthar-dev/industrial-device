@@ -4,10 +4,9 @@
 
 **Result: Passed with one known pre-existing sidebar presentation issue.**
 
-This report covers ML2 work completed through Chunk 4: navigation and screen
-shells, the reusable ML2 component library, and the detailed General and
-Measurements screens. Communications remains a placeholder because its
-detailed requirements have not yet been implemented.
+This report covers ML2 work completed through Chunk 7: the reusable ML2
+component library and the detailed General, Measurements, and Communications
+screens.
 
 ## Test environment
 
@@ -30,7 +29,29 @@ tests must run in a desktop-enabled process.
 - [x] ML2 page registration tests pass.
 - [x] Reusable component availability test passes.
 - [x] General responsive breakpoint tests pass.
-- [x] Full automated suite: **20 tests passed**.
+- [x] Full automated suite: **23 tests passed**.
+
+## Translation checks
+
+- [x] General, Measurements, and Communications use the existing `t()` helper.
+- [x] ML2 section keys use organized `*.sections.*` namespaces.
+- [x] Visible dropdown options and dummy display values are centralized.
+- [x] Sidebar labels remain centralized under `sidebar.*`.
+- [x] Automated AST inspection finds no missing literal ML2 translation keys.
+- [x] Live rendering finds no dotted translation-key fallbacks in any ML2 view.
+
+## ML2 keyboard navigation checks
+
+- [x] General exposes 18 controls in explicit visual focus order.
+- [x] Measurements exposes 22 controls in explicit visual focus order.
+- [x] Communications exposes 24 controls in explicit visual focus order.
+- [x] Tab advances, Shift+Tab reverses, and traversal wraps on all three views.
+- [x] Entries accept keyboard focus.
+- [x] ComboBoxes open by keyboard and support arrow navigation and selection.
+- [x] Space toggles focused checkboxes and radio choices.
+- [x] Enter activates focused action buttons.
+- [x] Communications segmented tabs activate through the keyboard.
+- [x] Normal mouse/command invocation remains functional.
 
 ## Measurements screen checks
 
@@ -47,6 +68,23 @@ tests must run in a desktop-enabled process.
 - [x] Tab, Shift+Tab, wrapping traversal, and radio Space activation pass.
 - [x] Navigation to other ML2 screens and Settings remains functional.
 
+## Communications screen checks
+
+- [x] All four required communication sections render.
+- [x] RS485 and RS232 settings and dummy packet counters render.
+- [x] USB information and its maintenance banner render.
+- [x] Expansion-module and 4G settings render.
+- [x] Password and PIN fields visually mask their values.
+- [x] 4G Settings and Module Information segmented choices work.
+- [x] All 12 dropdowns open and close successfully.
+- [x] All three right-side status panels and the information banner render.
+- [x] Right panel and header controls reflow at constrained widths.
+- [x] The explicit focus chain contains 24 targets.
+- [x] Tab, Shift+Tab, and wrapping keyboard traversal pass.
+- [x] Light and Dark themes apply without runtime errors.
+- [x] Export and Import actions remain placeholders.
+- [x] Navigation to other ML2 screens and Settings remains functional.
+
 ## PDF mockup rendering
 
 The ML2 mockup can be rendered for local visual QA with the development-only
@@ -57,9 +95,9 @@ PDFium utility. Install development requirements, then render a page:
 .\.venv\Scripts\python.exe tools\render_pdf.py C:\path\to\ML2.pdf mockup-page-1.png --page 1
 ```
 
-This renderer was verified against the supplied three-page `ML2.pdf`. Page 1
-rendered successfully at 1263 × 893 using the default 1.5 scale. PDFium is kept
-out of `requirements.txt`, so it does not affect the production application.
+This renderer was verified against all three pages of the supplied `ML2.pdf`.
+Pages render at 1263 × 893 using the default 1.5 scale. PDFium is kept out of
+`requirements.txt`, so it does not affect the production application.
 
 ## Navigation checks
 
@@ -155,10 +193,20 @@ Resolved on 12 September 2026 by removing the spacing suffix and rendering the
 centralized translated label directly. Live Windows rendering confirms that the
 complete **Configuration** label is now visible.
 
+### Expansion/4G narrow-layout clipping
+
+The Communications Expansion/4G cards previously collapsed into a narrow
+column at the 900 × 700 constrained layout because their old two-column Tk
+`uniform` group remained active after the controls moved to one column.
+
+Resolved on 12 September 2026 by clearing the uniform group in one-column mode
+and restoring it only in two-column mode. Live Windows QA confirms that module
+values, segmented tabs, labels, and masked Password/PIN fields now use the full
+available width.
+
 ## Remaining QA
 
-After the detailed Communications screen is implemented, repeat the same checks
-for:
+For later device-integration milestones, repeat the same checks for:
 
 - Required fields and dummy values.
 - Wide, medium, and narrow reflow.
