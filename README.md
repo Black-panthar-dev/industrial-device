@@ -86,8 +86,9 @@ imports, ML2 view registration, translation keys, theme tokens, responsive
 breakpoints, keyboard helpers, models, and reusable components. Live visual QA
 procedures and results are documented in `ML2_QA_REPORT.md`.
 
-The latest 25-item delivery checklist is in `ML2_DELIVERY_QA.md`, including
-failures and checks that still require a different Windows display setup.
+The latest 25-item delivery checklist is in `ML2_DELIVERY_QA.md`. The full ML2
+audit, including ML1 Settings regression coverage and checks requiring a
+different Windows display setup, is in `ML2_COMPLETE_QA.md`.
 For opt-in desktop QA, run the following from the project folder:
 
 ```powershell

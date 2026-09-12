@@ -1,51 +1,30 @@
-# Continuation Notes for the Power Monitor GUI project
+﻿# Power Monitor continuation notes
 
-## Current status
-The app entrypoint and launch behavior have been adjusted so the project is more reliable on Windows.
+## Current scope
 
-### What has already been changed
-- The app now opens on the Settings page by default.
-- The window title is now "Power Monitor".
-- The app prints a simple startup message: "Power Monitor started successfully".
-- The Windows launcher script was updated to use a corrected Python version check.
-- The main entrypoint now attempts to relaunch itself with the project virtual environment if CustomTkinter is not available in the currently active Python interpreter.
-- The Settings view has also been updated with a more responsive layout that reorganizes at smaller widths instead of squeezing the content.
+ML2 extends the client-accepted ML1 shell and Settings screen with General,
+Measurements, and Communications configuration pages. ML2 is GUI-only: dummy
+device values and placeholder actions, with no hardware, Modbus, serial/USB,
+network, database, or installer integration. ML1 Settings retains local JSON
+import/export, reset, folder selection, and its existing presentation.
 
-## Important files
-- [main.py](main.py) — app startup, default page, title, and virtual-environment fallback.
-- [views/settings_view.py](views/settings_view.py) — responsive Settings layout behavior.
-- [START_WINDOWS.bat](START_WINDOWS.bat) — Windows launcher logic.
-- [requirements.txt](requirements.txt) — Python dependencies.
-- [utils/theme.py](utils/theme.py) — shared colors and theme constants.
-- [widgets/](widgets/) — reusable UI control components.
+The app opens Settings by default. Launch with `START_WINDOWS.bat` or
+`.\.venv\Scripts\python.exe main.py` from the extracted project directory.
 
-## What to know before continuing
-- This is still Milestone 1 scope: GUI framework + Settings screen only.
-- No hardware communication, Modbus, database, or installer work was added.
-- The current app is a desktop GUI built with CustomTkinter and Tkinter.
+## QA and implementation references
 
-## Current priorities if continuing work
-1. Verify the app opens correctly on Windows using the launcher and the manual command.
-2. Review the settings screen visually at different window sizes and DPI scaling levels.
-3. Continue improving the responsive layout if any clipping remains.
-4. Continue polishing dark mode, ComboBox styling, and keyboard navigation later.
+- `ML2_WORK_COMPLETED.md`: chunk implementation record.
+- `ML2_DELIVERY_QA.md`: 25-item delivery checklist and follow-up findings.
+- `ML2_COMPLETE_QA.md`: comprehensive ML2 audit against ML1 QA categories.
+- `WINDOWS_QA_NOTES.md`: historical ML1 QA results.
+- `tools/qa_windows.py`: opt-in launch, keyboard and layout checks.
+- `tools/qa_ml2_complete.py`: complete interaction and scaling audit.
+- `qa_artifacts/`: local-only evidence and source delivery ZIP; excluded from Git.
 
-## How to run locally
-From the project folder:
+Keep reports explicit about native Windows display checks versus programmatic
+scaling/geometry checks. Native 1920x1080 at 125% and 150% still requires a
+suitable desktop. Do not infer a full native-DPI pass from unit tests.
 
-```powershell
-.
-.venv\Scripts\python.exe main.py
-```
-
-Or:
-
-```powershell
-START_WINDOWS.bat
-```
-
-## Known caveat
-The environment may still behave differently depending on whether the app is launched from the system Python or from the project virtual environment. The current fallback logic in [main.py](main.py) helps with that.
-
-## Suggested next step
-Open the project in the editor and test the app manually. If anything still fails to open, check whether the correct virtual environment exists and whether CustomTkinter is installed in it.
+Run `python -m pytest -q` with the project interpreter for the lightweight
+automated suite. Live tools need a Windows desktop-enabled process and write
+their evidence to the output directory supplied on the command line.

@@ -13,7 +13,7 @@ label-wrapping behavior, plus the live QA harness and documentation.
 
 | # | Check | Result | Evidence / limits |
 |---|---|---|---|
-| 1 | Fresh folder test | PASS | Source-only ZIP extracted into `qa_artifacts/fresh`, initially without `.venv`. |
+| 1 | Fresh folder test | PASS | Source-only ZIP extracted into a clean QA folder, initially without `.venv`; complete-audit candidate is `qa_artifacts/complete_fresh`. |
 | 2 | Run START_WINDOWS.bat | PASS | Created a fresh environment, installed dependencies, opened Power Monitor; closed normally, exit 0. |
 | 3 | Run python main.py manually | PASS | Fresh `.venv/Scripts/python.exe main.py` opened Power Monitor; closed normally, exit 0. |
 | 4 | General opens | PASS | Live sidebar invocation and mapped page assertion. |
@@ -21,18 +21,18 @@ label-wrapping behavior, plus the live QA harness and documentation.
 | 6 | Communications opens | PASS | Live sidebar invocation and mapped page assertion. |
 | 7 | Settings still opens | PASS | Live sidebar invocation and mapped page assertion. |
 | 8 | Sidebar active states | PASS | Selected item uses active color and all other items clear it on each navigation. |
-| 9 | Light mode | PASS | All four pages rendered in Light mode; screenshots saved. Layout failures are listed separately. |
-| 10 | Dark mode | PASS | All four pages rendered in Dark mode; screenshots saved. Layout failures are listed separately. |
+| 9 | Light mode | PASS | All four pages rendered; cross-page selectors and Settings theme values synchronized. |
+| 10 | Dark mode | PASS | All four pages rendered, including pages first created in Dark mode; foreground screenshots saved. |
 | 11 | 1366x768 at 100% | PASS | Actual display 1366x768; widget scaling 1.0. Windows limited client height to 749 pixels. No clipping detected after fixes. |
-| 12 | 1920x1080 at 125% | NOT VERIFIED | Requested 1536x864 logical client was capped to 1370x749 by this desktop. Breakpoint unit checks pass, but this is not the requested display test. |
-| 13 | 1920x1080 at 150% | PARTIAL | 1280x720 logical client rendered, with ML2 panels below. Native Windows 1920x1080/150% was not available. |
+| 12 | 1920x1080 at 125% | PARTIAL | Full virtual 1920x1080 geometry passed at programmatic 125% scaling after allowing off-screen window sizes. Native Windows 1920x1080/125% remains unverified. |
+| 13 | 1920x1080 at 150% | PARTIAL | Full virtual 1920x1080 geometry passed at programmatic 150% scaling. Native Windows 1920x1080/150% remains unverified. |
 | 14 | No clipped labels | PASS | Live allocated-width/text-size checks pass in both themes at all tested actual window sizes. Narrow subtitles and banner prose now wrap; collapsed form columns fixed. |
 | 15 | No clipped ComboBoxes | PASS | Selected text fits its entry area in all tested layouts, including narrow General timezone and Measurements shunt voltage/filter controls. |
 | 16 | Right panel below when narrow | PASS | All three ML2 pages re-grid their right panel below at 1280x720 and 760x540. |
-| 17 | Tab order | PASS | Generated Tab events traverse and wrap all 18/22/24/33 explicit targets on General/Measurements/Communications/Settings. |
+| 17 | Tab order | PASS | Generated Tab events traverse and wrap all 18/22/24/33 targets; focused controls now scroll into view. |
 | 18 | Shift+Tab | PASS | Reverse traversal and wrap checked on every explicit target. |
 | 19 | Enter/Space | PASS | All 34 ComboBoxes open with both keys. Focus-chain buttons, checkboxes and radios activate as appropriate. Button commands temporarily replaced with counters to avoid persistence/reset actions. |
-| 20 | No terminal errors | PASS for application | Both launch logs clean; final GUI runs reported no Tk callback errors. An initial QA-harness-only scaling accessor error was corrected before the successful runs. |
+| 20 | No terminal errors | PASS for application | Startup logs clean; completed live verification has no Tk callback errors. Initial diagnostics and corrected harness failures are retained separately. |
 | 21 | README updated | PASS | ML2 scope, startup, dependencies, tests, and live QA instructions documented. |
 | 22 | requirements.txt pinned | PASS | `customtkinter==5.2.2`, `pillow==10.4.0`; fresh environment `pip check` passes. Transitive dependencies are not lockfile-pinned. |
 | 23 | Tests included | PASS | All 39 automated tests pass in the project environment. Delivery ZIP includes test files and opt-in live QA harness. |
@@ -40,6 +40,10 @@ label-wrapping behavior, plus the live QA harness and documentation.
 | 25 | No __pycache__ in ZIP | PASS | ZIP entry audit excludes `__pycache__` and Python bytecode. |
 
 ## Resolved findings and evidence
+
+The complete follow-up audit in `ML2_COMPLETE_QA.md` additionally covers theme
+synchronization, visible keyboard focus, Settings file and section actions,
+popup lifecycle, scaling-refresh placement, and comparison with `ML2.pdf`.
 
 - General and Measurements retained a two-column Tk uniform group after moving
   controls to one column. Clearing the group in one-column mode gives controls

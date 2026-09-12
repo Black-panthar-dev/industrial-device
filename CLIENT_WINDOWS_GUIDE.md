@@ -1,10 +1,11 @@
-# Industrial Device Configurator — ML1 Windows Guide
+# Power Monitor — ML2 Windows Guide
 
 ## What is included
 
-Milestone 1 (ML1) provides the desktop application shell, navigation, reusable
-interface components, and the complete Settings screen. Device communication
-and live hardware integration are not included in this milestone.
+Milestone 2 (ML2) adds General, Measurements, and Communications configuration
+screens to the existing ML1 application shell and Settings screen. Device values
+are examples and ML2 actions are placeholders. Device communication and live
+hardware integration are not included in this milestone.
 
 ## Windows requirements
 
@@ -36,14 +37,19 @@ py -3 -m venv .venv
 .venv\Scripts\python.exe main.py
 ```
 
-## Using ML1
+## Using ML2
 
 - Use the left sidebar to move between application areas.
 - Open **Settings** using the gear button at the bottom-left.
 - Settings may be imported from or exported to a local JSON file.
-- Logo selection, export-folder selection, theme selection, reset, and Settings
-  section navigation operate locally.
-- Pages outside Settings are ML1 placeholders for future milestones.
+- Export-folder selection, theme selection, reset, and Settings section
+  navigation operate locally. There is no company-logo upload control.
+- Under **Configuration**, open **General**, **Measurements**, or
+  **Communications**. Their Export/Import and device-action buttons demonstrate
+  the interface and do not read or write device configuration files or hardware.
+- Other sidebar destinations remain placeholders for future milestones.
+- Theme changes apply throughout the application. Tab and Shift+Tab move
+  between form controls and reveal controls below the visible scroll area.
 
 ## Display recommendation
 

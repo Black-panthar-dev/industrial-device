@@ -90,7 +90,7 @@ class PageHeader(ctk.CTkFrame):
             self.controls.grid_columnconfigure(column, weight=0)
         for index, control in enumerate(self._controls):
             row, column = divmod(index, self._control_columns)
-            control.grid_configure(
+            control.grid(
                 row=row,
                 column=column,
                 padx=(8 if column else 0, 0),

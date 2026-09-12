@@ -105,8 +105,24 @@ class IndustrialDeviceConfiguratorApp(ctk.CTk):
             self.pages[page_name] = page
 
         self.current_page = self.pages[page_name]
+        self._sync_theme_controls()
         self.current_page.grid()
         self.sidebar.set_active(page_name)
+
+    def _set_appearance_mode(self, mode_string: str) -> None:
+        super()._set_appearance_mode(mode_string)
+        self._sync_theme_controls()
+
+    def _sync_theme_controls(self) -> None:
+        """Keep cached and newly opened pages consistent with the app theme."""
+        mode = ctk.get_appearance_mode()
+        for name, page in getattr(self, "pages", {}).items():
+            if isinstance(page, SettingsView):
+                page.controls["header_theme"].set(mode)
+                page.controls["theme"].set(mode)
+                page._sync_summary()
+            elif name in {"General", "Measurements", "Communications"}:
+                page.theme_menu.set(t(f"{name.lower()}.theme.{mode.lower()}"))
 
 
 def main() -> None:

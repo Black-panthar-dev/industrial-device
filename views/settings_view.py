@@ -496,13 +496,13 @@ class SettingsView(ctk.CTkFrame):
 
     def _layout_header(self, stacked: bool) -> None:
         if stacked:
-            self.header_heading.grid_configure(row=0, column=0, sticky="w")
-            self.header_actions.grid_configure(
+            self.header_heading.grid(row=0, column=0, sticky="w")
+            self.header_actions.grid(
                 row=1, column=0, padx=(0, 0), pady=(12, 0), sticky="w"
             )
         else:
-            self.header_heading.grid_configure(row=0, column=0, sticky="w")
-            self.header_actions.grid_configure(
+            self.header_heading.grid(row=0, column=0, sticky="w")
+            self.header_actions.grid(
                 row=0, column=1, padx=(20, 0), pady=(0, 0), sticky="e"
             )
 
@@ -515,13 +515,13 @@ class SettingsView(ctk.CTkFrame):
             self.workspace.grid_rowconfigure(0, weight=0)
             self.workspace.grid_rowconfigure(1, weight=1)
             self.workspace.grid_rowconfigure(2, weight=0)
-            self.section_menu.grid_configure(
+            self.section_menu.grid(
                 row=0, column=0, columnspan=3, padx=(30, 30), pady=(0, 16), sticky="ew"
             )
-            self.center.grid_configure(
+            self.center.grid(
                 row=1, column=0, columnspan=3, padx=(30, 30), pady=(0, 18), sticky="nsew"
             )
-            self.right_panel.grid_configure(
+            self.right_panel.grid(
                 row=2, column=0, columnspan=3, padx=(30, 30), pady=(0, 28), sticky="ew"
             )
             return
@@ -532,7 +532,7 @@ class SettingsView(ctk.CTkFrame):
         self.workspace.grid_columnconfigure(2, weight=0, minsize=0)
         self.workspace.grid_rowconfigure(0, weight=1)
         self.workspace.grid_rowconfigure(1, weight=0)
-        self.section_menu.grid_configure(
+        self.section_menu.grid(
             row=0,
             column=0,
             columnspan=1,
@@ -541,7 +541,7 @@ class SettingsView(ctk.CTkFrame):
             sticky="new",
         )
         if panel_below:
-            self.center.grid_configure(
+            self.center.grid(
                 row=0,
                 column=1,
                 columnspan=1,
@@ -549,7 +549,7 @@ class SettingsView(ctk.CTkFrame):
                 pady=(0, 18),
                 sticky="nsew",
             )
-            self.right_panel.grid_configure(
+            self.right_panel.grid(
                 row=1,
                 column=1,
                 columnspan=1,
@@ -559,7 +559,7 @@ class SettingsView(ctk.CTkFrame):
             )
         else:
             self.workspace.grid_columnconfigure(2, weight=0, minsize=270)
-            self.center.grid_configure(
+            self.center.grid(
                 row=0,
                 column=1,
                 columnspan=1,
@@ -567,7 +567,7 @@ class SettingsView(ctk.CTkFrame):
                 pady=(0, 28),
                 sticky="nsew",
             )
-            self.right_panel.grid_configure(
+            self.right_panel.grid(
                 row=0,
                 column=2,
                 columnspan=1,
@@ -587,7 +587,7 @@ class SettingsView(ctk.CTkFrame):
             )
         for index, button in enumerate(self.section_buttons):
             button.configure(height=40 if compact else 48)
-            button.grid_configure(
+            button.grid(
                 row=index // columns,
                 column=index % columns,
                 padx=4 if compact else 0,
@@ -602,15 +602,15 @@ class SettingsView(ctk.CTkFrame):
             self.connection_body, columns, 3, "connection"
         )
         port, baudrate, checks = self.connection_controls
-        port.grid_configure(row=0, column=0, padx=(0, 8), pady=2, sticky="ew")
-        baudrate.grid_configure(
+        port.grid(row=0, column=0, padx=(0, 8), pady=2, sticky="ew")
+        baudrate.grid(
             row=0 if columns > 1 else 1,
             column=1 if columns > 1 else 0,
             padx=(8, 0) if columns > 1 else (0, 8),
             pady=2,
             sticky="ew",
         )
-        checks.grid_configure(
+        checks.grid(
             row=2 if columns == 1 else (1 if columns == 2 else 0),
             column=0 if columns < 3 else 2,
             columnspan=columns if columns < 3 else 1,
@@ -647,7 +647,7 @@ class SettingsView(ctk.CTkFrame):
     def _grid_controls(controls: list[Any] | tuple[Any, ...], columns: int) -> None:
         for index, control in enumerate(controls):
             column = index % columns
-            control.grid_configure(
+            control.grid(
                 row=index // columns,
                 column=column,
                 padx=(
@@ -819,9 +819,18 @@ class SettingsView(ctk.CTkFrame):
         """Scroll the settings workspace to the selected inner section."""
         section = self.section_widgets[section_name]
         self.update_idletasks()
-        target_y = self.settings_surface.winfo_y() + section.winfo_y()
-        content_height = max(1, self.workspace._parent_frame.winfo_reqheight())
+        target_y = section.winfo_rooty() - self.workspace.winfo_rooty()
+        content_height = max(1, self.workspace.winfo_height())
         self.workspace._parent_canvas.yview_moveto(target_y / content_height)
+        icons = ("general", "connection", "application", "security", "reports")
+        for name, icon, button in zip(self.SECTION_NAMES, icons, self.section_buttons):
+            active = name == section_name
+            button.configure(
+                fg_color=COLOR_SECTION_ACTIVE if active else "transparent",
+                text_color=COLOR_PRIMARY if active else COLOR_TEXT,
+                image=create_icon(icon, 17, COLOR_PRIMARY if active else COLOR_TEXT_MUTED),
+            )
+            button.cget("font").configure(weight="bold" if active else "normal")
 
     def _collect_settings(self) -> dict[str, str | bool]:
         return {

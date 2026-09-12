@@ -213,6 +213,13 @@ banners and helper text now wrap to their allocated width. Live QA measures
 actual label and ComboBox text allocation and checks narrow-to-wide restoration.
 See `ML2_DELIVERY_QA.md` for results and outstanding native display checks.
 
+The complete ML1-style audit also corrected theme synchronization across pages,
+keyboard focus visibility, shared entry updates used by Settings file actions,
+popup closure before theme changes, and scaling-safe grid placement. Settings
+section scrolling now uses actual content height and highlights the selected
+section. Sample values and the calculated-measurements banner were compared
+with the supplied ML2 PDF. See `ML2_COMPLETE_QA.md` for the full verification.
+
 ## Files created during ML2
 
 - `views/general_view.py`

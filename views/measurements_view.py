@@ -171,7 +171,7 @@ class MeasurementsView(DebouncedResponsiveMixin, ctk.CTkFrame):
 
     def _build_calculated_section(self, row: int) -> None:
         fields = self._new_section(row, 4, "measurements.sections.calculated.title", "measurements.sections.calculated.subtitle")
-        banner = InlineInfoBanner(fields, t("measurements.calculated.banner"))
+        banner = InlineInfoBanner(fields, t("measurements.calculated.banner"), tone="success")
         enabled = CheckboxRow(fields, t("measurements.enable_calculated"), checked=True)
         reset = ActionButtonRow(fields, [(t("measurements.reset_counters"), lambda: self._placeholder_action(t("measurements.reset_counters")))])
         self._register_fields(fields, [banner, enabled, reset])
@@ -215,17 +215,17 @@ class MeasurementsView(DebouncedResponsiveMixin, ctk.CTkFrame):
         panel_below, one_column, header_stacked = mode
         self.header.set_control_columns(2 if one_column else 3)
         if panel_below:
-            self.right_panel.grid_configure(row=1, column=0, padx=30, pady=(0, 30), sticky="ew")
+            self.right_panel.grid(row=1, column=0, padx=30, pady=(0, 30), sticky="ew")
             self.workspace.grid_columnconfigure(1, minsize=0, weight=0)
         else:
-            self.right_panel.grid_configure(row=0, column=1, padx=(0, 30), pady=(0, 30), sticky="new")
+            self.right_panel.grid(row=0, column=1, padx=(0, 30), pady=(0, 30), sticky="new")
             self.workspace.grid_columnconfigure(1, minsize=285, weight=0)
         for parent, controls in self._form_groups:
             self._layout_fields(parent, controls, 1 if one_column else 2)
         if header_stacked:
-            self.header.controls.grid_configure(row=1, column=0, padx=0, pady=(14, 0), sticky="w")
+            self.header.controls.grid(row=1, column=0, padx=0, pady=(14, 0), sticky="w")
         else:
-            self.header.controls.grid_configure(row=0, column=1, padx=(24, 0), pady=0, sticky="ne")
+            self.header.controls.grid(row=0, column=1, padx=(24, 0), pady=0, sticky="ne")
 
     @staticmethod
     def _placeholder_action(action: str) -> None:

@@ -131,8 +131,10 @@ class _ModernComboPopup(ctk.CTkToplevel):
             self.close()
 
     def _select(self, value: str) -> None:
-        self.owner._dropdown_callback(value)
+        # A selection can change the application theme. Remove this transient
+        # window before theme callbacks redraw the widget tree.
         self.close()
+        self.owner._dropdown_callback(value)
         if self.owner.winfo_exists():
             self.owner.focus_set()
 
@@ -235,6 +237,30 @@ def keyboard_focus_target(control: Any) -> Any:
     raise TypeError(f"Unsupported keyboard control: {type(control).__name__}")
 
 
+def scroll_focus_into_view(target: Any) -> None:
+    """Reveal a focused control inside its scrollable workspace."""
+    ancestor = target.master
+    while ancestor is not None:
+        if isinstance(ancestor, ctk.CTkScrollableFrame):
+            canvas = ancestor._parent_canvas
+            bounds = canvas.bbox("all")
+            if bounds is None:
+                return
+            top = target.winfo_rooty() - canvas.winfo_rooty()
+            bottom = top + target.winfo_height()
+            margin = round(28 * ancestor._get_widget_scaling())
+            if top < margin:
+                delta = top - margin
+            elif bottom > canvas.winfo_height() - margin:
+                delta = bottom - canvas.winfo_height() + margin
+            else:
+                return
+            height = max(1, bounds[3] - bounds[1])
+            canvas.yview_moveto((canvas.canvasy(0) + delta - bounds[1]) / height)
+            return
+        ancestor = getattr(ancestor, "master", None)
+
+
 def configure_focus_chain(controls: Sequence[Any]) -> list[Any]:
     """Bind an explicit, wrapping Tab/Shift+Tab order for a control sequence."""
     targets: list[Any] = []
@@ -256,6 +282,7 @@ def configure_focus_chain(controls: Sequence[Any]) -> list[Any]:
         target.bind("<Tab>", lambda _event, i=index: move(i + 1), add="+")
         target.bind("<Shift-Tab>", lambda _event, i=index: move(i - 1), add="+")
         target.bind("<ISO_Left_Tab>", lambda _event, i=index: move(i - 1), add="+")
+        target.bind("<FocusIn>", lambda _event, item=target: scroll_focus_into_view(item), add="+")
     return targets
 
 
@@ -372,7 +399,8 @@ class LabeledEntry(_LabeledControl):
         return self.entry.get()
 
     def set(self, value: str) -> None:
-        self.entry.set(value)
+        self.entry.delete(0, "end")
+        self.entry.insert(0, value)
 
     def insert(self, value: str) -> None:
         """Insert text through CTkEntry's placeholder-aware public API."""

@@ -7,6 +7,10 @@
 ComboBox clipping. Native 1920 x 1080 DPI checks remain outstanding. The
 historical checks below do not override that audit.
 
+The complete ML1-style regression audit is documented in `ML2_COMPLETE_QA.md`:
+104 layout cases, 194 visible keyboard transitions, 34 popup checks, all 15
+sidebar destinations, Settings file operations, and window transitions.
+
 This report covers ML2 work completed through Chunk 11: the reusable ML2
 component library and the detailed General, Measurements, and Communications
 screens.
