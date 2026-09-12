@@ -30,7 +30,21 @@ tests must run in a desktop-enabled process.
 - [x] ML2 page registration tests pass.
 - [x] Reusable component availability test passes.
 - [x] General responsive breakpoint tests pass.
-- [x] Full automated suite: **17 tests passed**.
+- [x] Full automated suite: **18 tests passed**.
+
+## PDF mockup rendering
+
+The ML2 mockup can be rendered for local visual QA with the development-only
+PDFium utility. Install development requirements, then render a page:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe tools\render_pdf.py C:\path\to\ML2.pdf mockup-page-1.png --page 1
+```
+
+This renderer was verified against the supplied three-page `ML2.pdf`. Page 1
+rendered successfully at 1263 × 893 using the default 1.5 scale. PDFium is kept
+out of `requirements.txt`, so it does not affect the production application.
 
 ## Navigation checks
 
@@ -114,16 +128,17 @@ is controlled by Windows and is not an application layout failure.
 - [x] Save to File executes a placeholder action.
 - [x] No hardware, Modbus, serial, USB, or database logic is present.
 
-## Known issue
+## Resolved issue
 
 ### Configuration sidebar label truncation
 
-The existing **Configuration** group label appears truncated on the tested
-Windows layout (approximately `nfiguration`). The issue originates in the ML1
-sidebar presentation logic and is not caused by the new General screen.
+The existing **Configuration** group label previously appeared truncated on the
+tested Windows layout (approximately `nfiguration`). The issue originated in a
+manual spacing/caret suffix in the ML1 sidebar presentation logic.
 
-Priority: Low to medium. Navigation remains functional, but the label should be
-corrected during a sidebar polish pass.
+Resolved on 12 September 2026 by removing the spacing suffix and rendering the
+centralized translated label directly. Live Windows rendering confirms that the
+complete **Configuration** label is now visible.
 
 ## Remaining QA
 
@@ -136,4 +151,3 @@ the same checks for:
 - Keyboard traversal and activation.
 - Scroll reachability.
 - Navigation and ML1 regression behavior.
-

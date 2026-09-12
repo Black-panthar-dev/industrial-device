@@ -161,8 +161,6 @@ class Sidebar(ctk.CTkFrame):
         compact: bool = False,
     ) -> None:
         display_text = t(label_key)
-        if page_name == "Configuration":
-            display_text += "                              ⌃"
         button = ctk.CTkButton(
             parent,
             text=display_text,
