@@ -5,14 +5,15 @@ from typing import Any
 import customtkinter as ctk
 
 from services.translation_service import t
-from utils.theme import COLOR_ON_PRIMARY, COLOR_PRIMARY, COLOR_SCROLLBAR, COLOR_SCROLLBAR_HOVER, COLOR_TEXT
+from utils.responsive import DebouncedResponsiveMixin
+from utils.theme import COLOR_ON_PRIMARY, COLOR_PRIMARY, COLOR_SCROLLBAR, COLOR_SCROLLBAR_HOVER, COLOR_SUCCESS, COLOR_TEXT
 from widgets.cards import SectionCard
 from widgets.form_controls import CheckboxRow, LabeledDropdown, LabeledEntry, OutlineButton, PrimaryButton, ThemedComboBox, configure_focus_chain
 from widgets.icons import create_icon
 from widgets.ml2_components import ActionButtonRow, InlineInfoBanner, MetricValue, PageHeader, RadioGroup, ReadonlyField, SectionHeader, StatusPanel, StatusRow
 
 
-class MeasurementsView(ctk.CTkFrame):
+class MeasurementsView(DebouncedResponsiveMixin, ctk.CTkFrame):
     """Configure dummy measurement options without device communication."""
 
     PANEL_REFLOW_WIDTH = 1120
@@ -24,15 +25,12 @@ class MeasurementsView(ctk.CTkFrame):
         super().__init__(master, fg_color="transparent", **kwargs)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
-        self._resize_job: str | None = None
-        self._layout_mode: tuple[bool, bool, bool] | None = None
         self._form_groups: list[tuple[ctk.CTkFrame, list[ctk.CTkBaseClass]]] = []
         self.focus_controls: list[Any] = []
         self._build_header()
         self._build_workspace()
         self.focus_targets = configure_focus_chain(self.focus_controls)
-        self.bind("<Configure>", self._schedule_responsive_layout, add="+")
-        self.after_idle(self._apply_responsive_layout)
+        self._initialize_responsive_layout()
 
     @classmethod
     def get_layout_mode(cls, scaled_width: int | float, widget_scaling: int | float = 1.0) -> tuple[bool, bool, bool]:
@@ -188,7 +186,13 @@ class MeasurementsView(ctk.CTkFrame):
         panel = StatusPanel(self.right_panel, t(title_key))
         panel.grid(row=row, column=0, pady=(0, 14), sticky="ew")
         for item_row, (label_key, value) in enumerate(values):
-            StatusRow(panel.body, t(label_key), value, value_color=COLOR_PRIMARY if row == 0 else COLOR_TEXT).grid(row=item_row, column=0, sticky="ew")
+            if title_key == "measurements.live_panel.title":
+                value_color = COLOR_PRIMARY
+            elif title_key == "measurements.status_panel.title" and item_row == 0:
+                value_color = COLOR_SUCCESS
+            else:
+                value_color = COLOR_TEXT
+            StatusRow(panel.body, t(label_key), value, value_color=value_color).grid(row=item_row, column=0, sticky="ew")
 
     def _build_right_panel(self) -> None:
         self._status_panel(0, "measurements.live_panel.title", [
@@ -204,18 +208,9 @@ class MeasurementsView(ctk.CTkFrame):
             ("measurements.averaging", t("measurements.options.averaging.8")), ("measurements.filter", t("measurements.options.filter.moving_average")),
         ])
 
-    def _schedule_responsive_layout(self, _event: Any = None) -> None:
-        if self._resize_job is not None:
-            self.after_cancel(self._resize_job)
-        self._resize_job = self.after(self.RESIZE_DEBOUNCE_MS, self._apply_responsive_layout)
-
-    def _apply_responsive_layout(self) -> None:
-        self._resize_job = None
-        mode = self.get_layout_mode(self.winfo_width(), self._get_widget_scaling())
-        if mode == self._layout_mode:
-            return
-        self._layout_mode = mode
+    def _apply_layout_mode(self, mode: tuple[bool, ...]) -> None:
         panel_below, one_column, header_stacked = mode
+        self.header.set_control_columns(2 if one_column else 3)
         if panel_below:
             self.right_panel.grid_configure(row=1, column=0, padx=30, pady=(0, 30), sticky="ew")
             self.workspace.grid_columnconfigure(1, minsize=0, weight=0)

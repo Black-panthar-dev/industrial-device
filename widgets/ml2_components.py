@@ -64,17 +64,37 @@ class PageHeader(ctk.CTkFrame):
 
         self.controls = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self._control_count = 0
+        self._control_columns = 3
+        self._controls: list[ctk.CTkBaseClass] = []
 
     def add_control(self, control: ctk.CTkBaseClass) -> None:
         """Place a control created with ``header.controls`` as its parent."""
-        if self._control_count == 0:
+        self._controls.append(control)
+        self._control_count = len(self._controls)
+        if self._control_count == 1:
             self.controls.grid(row=0, column=1, padx=(24, 0), sticky="ne")
-        control.grid(
-            row=0,
-            column=self._control_count,
-            padx=(8 if self._control_count else 0, 0),
-        )
-        self._control_count += 1
+        self._layout_controls()
+
+    def set_control_columns(self, columns: int) -> None:
+        """Reflow controls without recreating them when horizontal space is limited."""
+        columns = max(1, columns)
+        if columns == self._control_columns:
+            return
+        self._control_columns = columns
+        self._layout_controls()
+
+    def _layout_controls(self) -> None:
+        for column in range(max(self._control_count, self._control_columns)):
+            self.controls.grid_columnconfigure(column, weight=0)
+        for index, control in enumerate(self._controls):
+            row, column = divmod(index, self._control_columns)
+            control.grid_configure(
+                row=row,
+                column=column,
+                padx=(8 if column else 0, 0),
+                pady=(8 if row else 0, 0),
+                sticky="ew",
+            )
 
 
 class StatusPanel(ctk.CTkFrame):

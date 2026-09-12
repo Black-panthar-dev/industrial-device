@@ -1,107 +1,116 @@
-# Industrial Device Configurator GUI
+# Power Monitor
 
-Industrial Device Configurator GUI is a Python 3 desktop application built with
-CustomTkinter. Milestone 1 provides the application shell, sidebar navigation,
-reusable UI components, placeholder pages, and the complete Settings screen.
+Power Monitor is a Windows-oriented CustomTkinter desktop application for
+configuring and monitoring an industrial power-monitoring device.
 
-> This milestone implements the GUI framework and Settings screen only. Hardware communication and real device integration are outside the current scope.
+## Milestone 2 scope
+
+Milestone 2 delivers the production GUI for:
+
+- General device information, date and time, and operating settings.
+- Voltage, current, processing, and calculated measurement settings.
+- RS485/Modbus RTU, RS232, USB, expansion-module, and 4G settings.
+- The existing Milestone 1 Settings screen and application shell.
+- Responsive layouts, Light/Dark themes, centralized English translations,
+  reusable controls, and keyboard navigation.
+
+Milestone 2 is **GUI only**. Displayed device values and actions are dummy or
+placeholder behavior. The codebase is structured for later device integration,
+but real hardware access, Modbus, RS485/RS232/USB/4G communication, measurement
+processing, database storage, and an installer are not implemented.
 
 ## Requirements
 
-- Python 3.10 or newer
-- A desktop environment capable of displaying Tkinter windows
+- Windows 10 or Windows 11.
+- Python 3.10 or newer, including Tkinter/Tcl support.
+- Internet access on first setup so Python packages can be installed.
 
-## Setup
+Tested dependency versions:
 
-From the project directory, create a virtual environment:
+- CustomTkinter 5.2.2
+- Pillow 10.4.0
+- pytest 9.1.1
+- pypdfium2 5.13.0 (QA/document tooling only)
 
-```bash
+Runtime dependencies are pinned in `requirements.txt`. Test and document-tool
+dependencies are pinned in `requirements-dev.txt`.
+
+## Run on Windows
+
+The simplest method is to extract the project and double-click
+`START_WINDOWS.bat`.
+
+The launcher:
+
+1. Checks for Python 3.10 or newer.
+2. Checks that Tkinter is available.
+3. Creates the local `.venv` environment when necessary.
+4. Installs the pinned runtime dependencies.
+5. Starts Power Monitor with `python main.py`.
+
+If setup or startup fails, the launcher keeps the window open and displays an
+actionable error message.
+
+## Run manually with Python
+
+Open PowerShell in the project directory and run:
+
+```powershell
 python -m venv .venv
-```
-
-Activate it on macOS or Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-On Windows:
-
-```powershell
-.venv\Scripts\activate
-```
-
-Install the dependencies:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-## Windows launcher
-
-Extract the project, then double-click `START_WINDOWS.bat`. The launcher checks
-that Python 3.10 or newer is available, creates `.venv` when missing, activates
-it, installs the pinned requirements, and starts Power Monitor.
-
-The first launch requires internet access to install dependencies. Later
-launches verify the same pinned versions before starting.
-
-## Manual run
-
-From the project directory, activate the virtual environment and run:
-
-```powershell
-.\.venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python main.py
 ```
 
-If dependencies are already installed in the active Python environment, the
-application can also be started directly:
+If the environment and dependencies already exist:
 
-```bash
-python main.py
+```powershell
+.\.venv\Scripts\python.exe main.py
 ```
 
-Use the left sidebar to switch between pages. Settings opens the implemented
-preferences screen; the other navigation items currently open reusable
-placeholder pages.
+Open **Configuration** in the sidebar to access General, Measurements, and
+Communications. Settings remains available from the sidebar.
+
+## Run automated tests
+
+Install the development dependencies and run pytest:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+The automated suite is lightweight and does not require a connected device,
+Modbus adapter, serial/USB interface, network module, or database. It verifies
+imports, ML2 view registration, translation keys, theme tokens, responsive
+breakpoints, keyboard helpers, models, and reusable components. Live visual QA
+procedures and results are documented in `ML2_QA_REPORT.md`.
 
 ## Project structure
 
 ```text
-industrial-device-configurator-gui/
-├── main.py                     # Application entry point and page switching
-├── requirements.txt            # Python dependencies
-├── views/
-│   ├── __init__.py
-│   ├── placeholder_view.py     # Reusable page placeholder
-│   └── settings_view.py        # Settings screen
-├── widgets/
-│   ├── __init__.py
-│   ├── cards.py                # Reusable cards and information rows
-│   ├── form_controls.py        # Reusable form inputs and buttons
-│   ├── icons.py                # Pillow-rendered interface icons
-│   └── sidebar.py              # Sidebar navigation
-└── utils/
-    ├── __init__.py
-    └── theme.py                # Shared colors and theme constants
+Power Monitor/
+|-- main.py                       Application entry point and page routing
+|-- START_WINDOWS.bat             Windows setup and launch helper
+|-- requirements.txt              Pinned runtime dependencies
+|-- requirements-dev.txt          Pinned test and QA dependencies
+|-- locales/en.json               Centralized English interface strings
+|-- services/                     Translation and local preference services
+|-- utils/                        Theme and responsive-layout utilities
+|-- views/
+|   |-- general_view.py           General configuration screen
+|   |-- measurements_view.py      Measurements configuration screen
+|   |-- communications_view.py    Communications configuration screen
+|   `-- settings_view.py          Application Settings screen
+|-- widgets/                      Shared cards, controls, icons, and ML2 widgets
+|-- test_*.py                     Automated delivery tests
+|-- ML2_WORK_COMPLETED.md          Milestone implementation record
+`-- ML2_QA_REPORT.md               Milestone QA record
 ```
 
-## Milestone 1 scope
+## Translation and themes
 
-This milestone is limited to the GUI framework and Settings screen. Settings
-can be imported from and exported to local JSON files. Reset,
-export-folder selection, theme selection, and section navigation are implemented
-locally. Placeholder models document the future separation between local
-application preferences and per-device JSON configuration files. The application
-does not communicate with Power Monitor hardware. Hardware protocols, Modbus,
-databases, installers, and production device logic are
-intentionally not included.
-
-## Translation structure
-
-Visible interface text is centralized in `locales/en.json` and accessed through
-`services/translation_service.py` with dotted keys such as
-`t("settings.title")`. English is the only locale currently included; additional
-JSON locale files can be added later without changing view layout code.
+Visible interface strings are loaded from `locales/en.json` through the shared
+translation service. English is the current delivery locale. Light and Dark
+colors are centralized in `utils/theme.py`; production ML2 views do not define
+screen-specific hexadecimal colors.

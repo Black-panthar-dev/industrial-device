@@ -2,7 +2,7 @@
 
 ## Document status
 
-This document records the Milestone 2 work completed through **Chunk 7**. The
+This document records the Milestone 2 work completed through **Chunk 11**. The
 General, Measurements, and Communications screens are implemented in detail
 within the approved GUI-only scope.
 
@@ -146,6 +146,65 @@ Buttons support Enter and Space, checkboxes and radio choices support Space,
 and Communications segmented tabs are included in the normal focus order.
 Mouse command behavior remains unchanged.
 
+## Chunk 8 — Responsive layout QA
+
+General, Measurements, and Communications were audited at 1366 × 768, at
+1920 × 1080 DPI-equivalent logical sizes for 125% and 150% scaling, and at the
+760 × 540 minimum test window. All three views use the same DPI-normalized
+breakpoints and a 180 ms resize debounce. Resizing only changes grid placement;
+it does not destroy or rebuild screen content.
+
+The right status panel remains beside the main form when the content viewport
+is at least 1120 logical pixels wide and moves below it at narrower widths.
+Form groups switch to one column below 720 logical pixels, while page-header
+controls move below the title below 900 logical pixels. At the minimum layout,
+the three header controls now reflow to two columns so no button is squeezed or
+cut off. All page content remains vertically scrollable.
+
+## Chunk 9 — Light/Dark theme QA
+
+General, Measurements, Communications, and Settings were rendered and switched
+live between Light and Dark modes. All paired theme values resolved correctly,
+and the dark render contained no unintended white card or panel surfaces.
+Entries, ComboBoxes, checkboxes, radio buttons, buttons, banners, section cards,
+read-only fields, scrollbars, and right-side status panels use centralized theme
+tokens.
+
+Operational states such as Connected, Ready, OK, Available, and Synchronized
+use the shared success color where they appear as status values. Success,
+danger, normal text, and muted text tokens meet a 4.5:1 contrast threshold
+against their corresponding card surfaces in both appearance modes. Automated
+checks also reject literal hex colors added directly to ML2 production views.
+
+## Chunk 10 — Performance cleanup
+
+The three ML2 screens now share `DebouncedResponsiveMixin` instead of carrying
+three copies of the resize scheduling code. Resize events within the current
+breakpoint perform no scheduled work, repeated events headed toward the same
+breakpoint reuse one pending timer, and minimized one-pixel geometry events are
+ignored. If a drag returns to the active breakpoint before the debounce expires,
+the pending reflow is cancelled.
+
+Breakpoint changes only update the grid positions and weights of existing
+widgets. Pages, cards, fields, and scrollable frames are never destroyed or
+recreated by resize callbacks. Each ML2 page retains one scrollable workspace.
+The existing icon factory already caches both `CTkImage` instances and rendered
+Pillow images with bounded LRU caches, so no additional image churn occurs.
+
+## Chunk 11 — Delivery tests and README
+
+The delivery includes the complete lightweight automated suite. Explicit checks
+now cover application and view imports, required translation strings, paired
+theme colors, ML2 page registration, exact runtime dependency pins, and the
+Windows launcher's ML2 entry point. Tests remain hardware-independent and do
+not initialize Modbus, serial/USB communication, networking, or a database.
+
+The README now identifies the product as Power Monitor, documents the full ML2
+GUI scope and exclusions, describes `START_WINDOWS.bat`, manual Python startup,
+and test commands, and records the dependency versions used for QA. The stale
+Milestone 1 launcher heading was updated to Milestone 2. Runtime and development
+dependencies are pinned for reproducible delivery.
+
 ## Files created during ML2
 
 - `views/general_view.py`
@@ -157,6 +216,10 @@ Mouse command behavior remains unchanged.
 - `test_general_view.py`
 - `test_measurements_view.py`
 - `test_communications_view.py`
+- `test_ml2_responsive.py`
+- `test_ml2_theme_qa.py`
+- `test_responsive_scheduler.py`
+- `test_ml2_delivery.py`
 - `ML2_WORK_COMPLETED.md`
 - `ML2_QA_REPORT.md`
 

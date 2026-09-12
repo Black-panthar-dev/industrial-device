@@ -4,7 +4,7 @@
 
 **Result: Passed with one known pre-existing sidebar presentation issue.**
 
-This report covers ML2 work completed through Chunk 7: the reusable ML2
+This report covers ML2 work completed through Chunk 11: the reusable ML2
 component library and the detailed General, Measurements, and Communications
 screens.
 
@@ -203,6 +203,73 @@ Resolved on 12 September 2026 by clearing the uniform group in one-column mode
 and restoring it only in two-column mode. Live Windows QA confirms that module
 values, segmented tabs, labels, and masked Password/PIN fields now use the full
 available width.
+
+### Chunk 8 responsive-layout pass
+
+The three ML2 production screens were checked against these logical viewport
+classes:
+
+- 1366 × 768 at 100%: side status panel beside the main form.
+- 1920 × 1080 at 125%: wide layout retained.
+- 1920 × 1080 at 150%: side status panel moves below the main form.
+- 760 × 540 minimum window: panel below, one-column forms, stacked header.
+
+Geometry inspection found no clipped ML2 buttons or partially hidden
+ComboBoxes. The minimum-width header requested four pixels more than its
+available row before Tk layout compression; `PageHeader` now reflows its three
+controls into two columns at the one-column breakpoint. This reuses the
+existing widgets and therefore avoids screen reconstruction during resizing.
+
+Automated coverage in `test_ml2_responsive.py` protects the shared breakpoint,
+DPI-normalization, and resize-debounce behavior for General, Measurements, and
+Communications.
+
+### Chunk 9 Light/Dark theme pass
+
+General, Measurements, Communications, and Settings were instantiated together
+and switched live between both appearance modes. The inspection covered 34
+ComboBoxes, 43 entries, 18 checkboxes, the Measurements radio controls, action
+buttons, inline banners, cards, scrollable areas, and right-side status panels.
+
+- [x] All theme-pair values resolved for the active appearance mode.
+- [x] No unintended white frame/card surfaces appeared in Dark mode.
+- [x] Normal and muted text remain readable on card surfaces.
+- [x] Connected, Ready, OK, Available, and related positive states use the
+  theme-aware success accent in status panels.
+- [x] Success and danger colors exceed 4.5:1 contrast against Light and Dark
+  card surfaces.
+- [x] ML2 production views contain no literal hexadecimal colors.
+- [x] Settings and its danger/reset presentation remain functional.
+
+Automated theme QA is recorded in `test_ml2_theme_qa.py`.
+
+### Chunk 10 performance cleanup
+
+- [x] Each ML2 view uses one scrollable workspace.
+- [x] Responsive callbacks do not create or destroy widgets.
+- [x] Repeated events within one breakpoint do not schedule layout work.
+- [x] Repeated events targeting the same new breakpoint reuse one timer.
+- [x] Pending reflow is cancelled when a drag returns to the current mode.
+- [x] Minimize-sized geometry events are ignored.
+- [x] Breakpoint changes only re-grid existing controls and panels.
+- [x] Icons and their appearance-specific Pillow renders use bounded LRU caches.
+
+Scheduler behavior is covered by `test_responsive_scheduler.py` and live
+minimize, restore, maximize, and resize checks.
+
+### Chunk 11 delivery checks
+
+- [x] Application module imports without creating a Tk window.
+- [x] General, Measurements, Communications, and Settings views import.
+- [x] Required ML2 translation keys load without fallback text.
+- [x] Required theme colors load as Light/Dark pairs.
+- [x] General, Measurements, and Communications are registered page types.
+- [x] Runtime dependencies use exact version pins.
+- [x] Development/QA dependencies use exact version pins.
+- [x] Windows launcher identifies Milestone 2 and starts `main.py`.
+- [x] Automated tests require no hardware, Modbus, serial, USB, or database.
+- [x] Repository root contains no loose temporary, screenshot, log, backup, or
+  debug files.
 
 ## Remaining QA
 

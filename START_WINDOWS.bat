@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 
-echo Power Monitor - Milestone 1
+echo Power Monitor - Milestone 2
 echo ===========================
 
 if exist ".venv\Scripts\python.exe" (
