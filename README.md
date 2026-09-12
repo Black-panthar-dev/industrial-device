@@ -86,6 +86,21 @@ imports, ML2 view registration, translation keys, theme tokens, responsive
 breakpoints, keyboard helpers, models, and reusable components. Live visual QA
 procedures and results are documented in `ML2_QA_REPORT.md`.
 
+The latest 25-item delivery checklist is in `ML2_DELIVERY_QA.md`, including
+failures and checks that still require a different Windows display setup.
+For opt-in desktop QA, run the following from the project folder:
+
+```powershell
+.\.venv\Scripts\python.exe tools\qa_windows.py gui qa_artifacts\results
+```
+
+This opens the application, exercises navigation and keyboard controls, and
+saves layout measurements and screenshots. Requested window sizes may be
+capped by the desktop; inspect actual sizes in the JSON results. Logical-size
+checks do not certify native Windows DPI settings. The harness's `launch`
+mode runs the launcher and manual entry point, then closes newly opened Power
+Monitor windows; use it in an isolated extracted delivery folder.
+
 ## Project structure
 
 ```text

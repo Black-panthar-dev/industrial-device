@@ -2,7 +2,10 @@
 
 ## QA status
 
-**Result: Passed with one known pre-existing sidebar presentation issue.**
+**Latest delivery result: 23 passed, 0 failed, 2 incomplete.** See
+`ML2_DELIVERY_QA.md` for the 25-item fresh-folder audit and resolved label and
+ComboBox clipping. Native 1920 x 1080 DPI checks remain outstanding. The
+historical checks below do not override that audit.
 
 This report covers ML2 work completed through Chunk 11: the reusable ML2
 component library and the detailed General, Measurements, and Communications
@@ -29,7 +32,7 @@ tests must run in a desktop-enabled process.
 - [x] ML2 page registration tests pass.
 - [x] Reusable component availability test passes.
 - [x] General responsive breakpoint tests pass.
-- [x] Full automated suite: **23 tests passed**.
+- [x] Full automated suite: **39 tests passed** (12 September 2026 rerun).
 
 ## Translation checks
 

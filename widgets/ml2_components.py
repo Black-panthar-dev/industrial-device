@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, Literal
 
 import customtkinter as ctk
+from utils.responsive import wrap_label_to_width
 
 from utils.theme import (
     COLOR_BORDER,
@@ -61,6 +62,7 @@ class PageHeader(ctk.CTkFrame):
             wraplength=760,
         )
         self.subtitle_label.grid(row=1, column=0, pady=(5, 0), sticky="ew")
+        wrap_label_to_width(self.subtitle_label)
 
         self.controls = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self._control_count = 0
@@ -259,6 +261,7 @@ class SectionHeader(ctk.CTkFrame):
                 wraplength=720,
             )
             self.description_label.grid(row=1, column=1, pady=(3, 0), sticky="ew")
+            wrap_label_to_width(self.description_label)
 
 
 class ReadonlyField(ctk.CTkFrame):
@@ -302,6 +305,7 @@ class ReadonlyField(ctk.CTkFrame):
                 self, text=helper_text, text_color=COLOR_TEXT_MUTED, anchor="w"
             )
             self.helper_label.grid(row=2, column=0, pady=(4, 0), sticky="ew")
+            wrap_label_to_width(self.helper_label)
 
     def get(self) -> str:
         return self.variable.get()
@@ -383,6 +387,7 @@ class InlineInfoBanner(ctk.CTkFrame):
             wraplength=720,
         )
         self.message_label.grid(row=0, column=1, padx=(0, 12), pady=12, sticky="ew")
+        wrap_label_to_width(self.message_label)
 
 
 class RadioGroup(ctk.CTkFrame):

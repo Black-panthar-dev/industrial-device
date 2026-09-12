@@ -105,7 +105,10 @@ class GeneralView(DebouncedResponsiveMixin, ctk.CTkFrame):
     @staticmethod
     def _layout_fields(parent: ctk.CTkFrame, controls: list[ctk.CTkBaseClass], columns: int) -> None:
         for column in (0, 1):
-            parent.grid_columnconfigure(column, weight=1 if column < columns else 0)
+            parent.grid_columnconfigure(
+                column, weight=1 if column < columns else 0,
+                uniform="general_reflow" if columns > 1 else "",
+            )
         for index, control in enumerate(controls):
             row, column = divmod(index, columns)
             padding = (0, 8) if column == 0 and columns > 1 else ((8, 0) if column else 0)

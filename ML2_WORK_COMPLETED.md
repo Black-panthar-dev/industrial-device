@@ -205,6 +205,14 @@ and test commands, and records the dependency versions used for QA. The stale
 Milestone 1 launcher heading was updated to Milestone 2. Runtime and development
 dependencies are pinned for reproducible delivery.
 
+## Delivery QA follow-up — 12 September 2026
+
+Fixed narrow General/Measurements form compression by clearing inactive
+two-column uniform sizing. Shared subtitles, section descriptions, information
+banners and helper text now wrap to their allocated width. Live QA measures
+actual label and ComboBox text allocation and checks narrow-to-wide restoration.
+See `ML2_DELIVERY_QA.md` for results and outstanding native display checks.
+
 ## Files created during ML2
 
 - `views/general_view.py`

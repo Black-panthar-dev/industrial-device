@@ -3,6 +3,7 @@ import sys
 from typing import Any
 
 import customtkinter as ctk
+from utils.responsive import wrap_label_to_width
 
 from utils.theme import (
     COLOR_ACTIVE,
@@ -294,6 +295,7 @@ class _LabeledControl(ctk.CTkFrame):
                 height=14,
             )
             self.helper_label.grid(row=2, column=0, pady=(5, 0), sticky="ew")
+            wrap_label_to_width(self.helper_label)
 
 
 class LabeledDropdown(_LabeledControl):

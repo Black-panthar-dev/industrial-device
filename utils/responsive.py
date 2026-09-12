@@ -1,6 +1,21 @@
 """Shared, low-overhead responsive layout scheduling."""
 
 from typing import Any
+import tkinter as tk
+
+
+def wrap_label_to_width(label: Any) -> None:
+    """Wrap prose to its allocated logical width, including after DPI changes."""
+    def update_wrap(event: Any) -> None:
+        if event.width <= 1:
+            return
+        width = max(1, int(event.width / label._get_widget_scaling()) - 2)
+        if label.cget("wraplength") != width:
+            label.configure(wraplength=width)
+
+    # CTkLabel.bind targets its internal text/canvas. Measure the allocated
+    # outer frame instead, so wrapping cannot feed back on the text's width.
+    tk.Misc.bind(label, "<Configure>", update_wrap, add="+")
 
 
 class DebouncedResponsiveMixin:

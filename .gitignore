@@ -20,3 +20,4 @@ Thumbs.db
 
 # Temporary QA artifacts
 qa_*.png
+qa_artifacts/
