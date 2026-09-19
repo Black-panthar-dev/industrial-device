@@ -81,10 +81,7 @@ class IndustrialDeviceConfiguratorApp(ctk.CTk):
         self.show_page("Settings")
 
     def show_page(self, page_name: str) -> None:
-        """Show a page by name, creating it the first time it is requested."""
-        if self.current_page is not None:
-            self.current_page.grid_remove()
-
+        """Raise a cached page, creating and gridding it only on first use."""
         if page_name not in self.pages:
             page_types = {
                 "General": GeneralView,
@@ -103,20 +100,29 @@ class IndustrialDeviceConfiguratorApp(ctk.CTk):
 
             page.grid(row=0, column=0, sticky="nsew")
             self.pages[page_name] = page
+            self._sync_theme_controls(page_name)
 
-        self.current_page = self.pages[page_name]
-        self._sync_theme_controls()
-        self.current_page.grid()
+        page = self.pages[page_name]
+        if page is self.current_page:
+            return
+        # Keep the complete widget trees mapped in the same cell. Raising a
+        # sibling avoids remapping and laying out every child on each visit.
+        page.tkraise()
+        self.current_page = page
         self.sidebar.set_active(page_name)
 
     def _set_appearance_mode(self, mode_string: str) -> None:
+        previous_mode = self._get_appearance_mode()
         super()._set_appearance_mode(mode_string)
-        self._sync_theme_controls()
+        if self._get_appearance_mode() != previous_mode:
+            self._sync_theme_controls()
 
-    def _sync_theme_controls(self) -> None:
+    def _sync_theme_controls(self, page_name: str | None = None) -> None:
         """Keep cached and newly opened pages consistent with the app theme."""
         mode = ctk.get_appearance_mode()
         for name, page in getattr(self, "pages", {}).items():
+            if page_name is not None and name != page_name:
+                continue
             if isinstance(page, SettingsView):
                 page.controls["header_theme"].set(mode)
                 page.controls["theme"].set(mode)

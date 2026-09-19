@@ -2,9 +2,54 @@
 
 ## Document status
 
-This document records the Milestone 2 work completed through **Chunk 11**. The
+This document records the Milestone 2 work completed through **Chunk 11** and
+the client-requested QA fixes recorded below. The
 General, Measurements, and Communications screens are implemented in detail
 within the approved GUI-only scope.
+
+## Client-requested QA fix: page navigation performance (19 September 2026)
+
+**Status: implemented and locally verified; client acceptance pending.**
+
+The client reported that switching between General, Measurements, and
+Communications took 2–3 seconds on every visit, with the central area progressively
+redrawing and labels appearing before the rest of the UI. The client requested
+that page navigation performance be addressed first, preserving the existing
+architecture and visual design.
+
+Changes delivered:
+
+- `main.py`: create and grid each page once, cache it in the shared content
+  container, and use `tkraise()` for subsequent switches instead of removing
+  and re-gridding the page's widget tree.
+- `main.py`: synchronize theme controls only for a newly created page or when
+  the appearance mode actually changes, rather than on every navigation.
+- `main.py`: skip work when the selected page is already active.
+- `tools/qa_navigation.py`: add a live regression and timing check for all
+  sidebar screens, cached page reuse, mapped pages, stacking order, and theme
+  synchronization, including a page first opened in dark mode.
+
+Validation: all 39 existing tests passed. The live check passed across 15 cached
+screens and 75 switches, measuring 75.9 ms median, 193.6 ms p95, and 246.5 ms
+maximum, including queued UI work. These are local measurements; first visits
+still incur lazy page creation.
+
+Retest requested by the user (19 September 2026): all 39 regression tests passed
+again. The strengthened live check passed across 15 cached screens and 75
+switches: 89.1 ms median, 227.6 ms p95, and 449.1 ms maximum, including queued
+UI work. It confirmed no page re-gridding, no widget map/unmap events during
+cached navigation, no navigation-triggered theme synchronization, retained
+edited input, no work on active-page reselection, correct Light/Dark controls,
+and no Tk callback errors. This verifies the cached-navigation behavior locally;
+visual smoothness on the client's machine still needs client confirmation.
+
+To repeat the timing check, run
+`.venv\Scripts\python.exe tools\qa_navigation.py`. For manual client QA, launch
+`START_WINDOWS.bat`, visit General, Measurements, and Communications once, then
+switch repeatedly and check redraw, retained values, scrolling, and both themes.
+
+This entry covers only the client's page navigation performance request; other
+client QA feedback is outside this fix.
 
 ## ML2 scope
 
